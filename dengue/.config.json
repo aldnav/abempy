@@ -1,0 +1,18 @@
+{
+	"environment": {
+		"time_steps": 100,
+		"no_of_persons": 100000,
+		"no_of_mosquitoes": 100000
+	},
+	"contact": {
+		"death_by_incidence": 0.1
+	},
+	"disease": {
+		"infection_duration": [7, 14],
+		"infection_probability_person": 0.07,
+		"infection_probability_mosquito": 0.5,
+		"initially_infected_persons": 0.05,
+		"initially_recovered_persons": 0,
+		"initially_infected_mosquitoes": 0.01
+	}
+}
