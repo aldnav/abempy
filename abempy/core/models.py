@@ -43,16 +43,19 @@ class Manager(object):
         for agent in self.queue:
             agent.environment = self.environment
 
+    # DEPRECATED! DO NOT USE! EXTREMELY SLOW
     #: Returns the number of susceptible agents
     def count_susceptible(self):
         return len(
             [a for a in self.queue if a.state == Agent.STATES.SUSCEPTIBLE]
         )
 
+    # DEPRECATED! DO NOT USE! EXTREMELY SLOW
     #: Returns the number of infected agents
     def count_infected(self):
         return len([a for a in self.queue if a.state == Agent.STATES.INFECTED])
 
+    # DEPRECATED! DO NOT USE! EXTREMELY SLOW
     #: Returns the number of recovered agents
     def count_recovered(self):
         return len([a for a in self.queue if a.state == Agent.STATES.RECOVERED])
