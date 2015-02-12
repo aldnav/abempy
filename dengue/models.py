@@ -12,9 +12,12 @@ import settings
 
 class Person(models.Agent):
     """The person agent"""
-    #: The duration of a person in INFECTED state
-    infection_duration = random.randrange(
-        *settings.disease["infection_duration"])
+
+    def __init__(self, *args, **kwargs):
+        models.Agent.__init__(self, *args, **kwargs)
+        self.infection_duration = random.randrange(
+            *settings.disease["infection_duration"])
+        self.infection_probability = float(settings.disease["infection_probability_person"])
 
     def run(self):
         #: CASE: Currently infected so infection duration minimized
@@ -25,14 +28,23 @@ class Person(models.Agent):
             else:
                 self.state = STATES.RECOVERED
                 self.is_latent = False
+                # update person manager
+                self.environment.person_manager.counter_recovered += 1
+                self.environment.person_manager.counter_infected -= 1
 
 
 class Mosquito(models.Agent):
     """The mosquito agent"""
-    #: Tells whether the mosquito is dying
-    is_dying = False
-    #: Indicates the chance of mosquito's death by incidence
-    death_probability = settings.contact["death_by_incidence"]
+
+
+    def __init__(self, *args, **kwargs):
+        models.Agent.__init__(self, *args, **kwargs)
+        #: Tells whether the mosquito is dying
+        self.is_dying = False
+        #: Indicates the chance of mosquito's death by incidence
+        self.death_probability = float(settings.contact["death_by_incidence"])
+        #: Indicates the chance of the mosquito to get infected
+        self.infection_probability = float(settings.disease["infection_probability_mosquito"])
 
     def run(self):
         """
@@ -72,9 +84,13 @@ class Mosquito(models.Agent):
             # CASE: Mosquito is infected, person is susceptible
             if (target_person.state is STATES.SUSCEPTIBLE and
                     self.state is STATES.INFECTED):
+                print target_person.infection_probability
                 if random.random() < target_person.infection_probability:
                     target_person.state = STATES.INFECTED
                     target_person.is_latent = True
+                    # update person manager
+                    self.environment.person_manager.counter_infected += 1
+                    self.environment.person_manager.counter_susceptible -= 1
                     return
         # CASE: Mosquito is not infected yet
         if not self.is_latent:
@@ -84,10 +100,18 @@ class Mosquito(models.Agent):
                 if random.random() < self.infection_probability:
                     self.state = STATES.INFECTED
                     self.is_latent = True
+                    # update mosquito manager
+                    self.environment.mosquito_manager.counter_infected += 1
+                    self.environment.mosquito_manager.counter_susceptible -= 1
                     return
 
 
 class PersonManager(models.Manager):
+    # counters for states
+    counter_susceptible = 0
+    counter_infected = 0
+    counter_recovered = 0
+
     """Manages the person agents"""
     def __init__(self, queue, *args, **kwargs):
         models.Manager.__init__(self, queue, *args, **kwargs)
@@ -102,6 +126,11 @@ class PersonManager(models.Manager):
             settings.disease['initially_recovered_persons'] *
             settings.environment['no_of_persons'])
 
+        #: reset counters for states
+        self.counter_susceptible = int(settings.environment['no_of_persons']) - (infected_count + recovered_count)
+        self.counter_infected = infected_count
+        self.counter_recovered = recovered_count
+
         for person in self.queue:
             if infected_count > 0:
                 person.state = STATES.INFECTED
@@ -114,8 +143,21 @@ class PersonManager(models.Manager):
                 else:
                     break
 
+    def count_susceptible(self):
+        return self.counter_susceptible
+
+    def count_infected(self):
+        return self.counter_infected
+
+    def count_recovered(self):
+        return self.counter_recovered
+
 
 class MosquitoManager(models.Manager):
+    # counters for states
+    counter_susceptible = 0
+    counter_infected = 0
+
     """Manages the mosquito agents"""
     def __init__(self, queue, *args, **kwargs):
         models.Manager.__init__(self, queue, *args, **kwargs)
@@ -126,6 +168,9 @@ class MosquitoManager(models.Manager):
         infected_count = int(
             settings.disease['initially_infected_mosquitoes'] *
             settings.environment['no_of_mosquitoes'])
+        #: reset counters for states
+        self.counter_susceptible = int(settings.environment['no_of_persons']) - infected_count
+        self.counter_infected = infected_count
 
         for mosquito in self.queue:
             if infected_count > 0:
@@ -134,3 +179,9 @@ class MosquitoManager(models.Manager):
                 infected_count -= 1
             else:
                 break
+
+    def count_susceptible(self):
+        return self.counter_susceptible
+
+    def count_infected(self):
+        return self.counter_infected
