@@ -84,7 +84,6 @@ class Mosquito(models.Agent):
             # CASE: Mosquito is infected, person is susceptible
             if (target_person.state is STATES.SUSCEPTIBLE and
                     self.state is STATES.INFECTED):
-                print target_person.infection_probability
                 if random.random() < target_person.infection_probability:
                     target_person.state = STATES.INFECTED
                     target_person.is_latent = True
