@@ -57,6 +57,22 @@ class Manager(object):
     def count_recovered(self):
         return len([a for a in self.queue if a.state == Agent.STATES.RECOVERED])
 
+    #: Deprecated! Do not use. Extremely slow!
+    def count_by_states(self):
+        susceptible = 0
+        recovered = 0
+        infected = 0
+
+        for a in self.queue:
+            if a.state == Agent.STATES.SUSCEPTIBLE:
+                susceptible += 1
+            elif a.state == Agent.STATES.INFECTED:
+                infected += 1
+            else:
+                recovered += 1
+
+        return (susceptible, infected, recovered)
+
     def run(self):
         for agent in self.queue:
             agent.run()
