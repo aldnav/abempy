@@ -1,4 +1,7 @@
 {
+    "system": {
+        "generate_output_file": 1
+    },
 	"environment": {
 		"time_steps": 100,
 		"no_of_persons": 100000,

@@ -30,8 +30,10 @@ class Environment(environment.Environment):
     def simulate(self):
         self.log_headers()
         time_steps = settings.environment['time_steps']
+        to_log_results = settings.system['generate_output_file']
         for time_step in xrange(1, time_steps+1):
-            self.log_results(time_step)
+            if to_log_results:
+                self.log_results(time_step)
             self.mosquito_manager.run()
             self.person_manager.run()
 
