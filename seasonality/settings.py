@@ -2,6 +2,14 @@
 
 __config_file__ = '.config.json'
 __matrix_file__ = 'matrix.csv'
+OUTPUT_EXCEL_FILENAME = 'results'
+
+# Export reports
+REPORTS = (
+    # sheet name : column names
+    ('Person States', ['Susceptible', 'Infected', 'Recovered']),
+    ('Mosquito States', ['Susceptible', 'Infected'])
+)
 
 import json
 
@@ -36,9 +44,9 @@ for season in system['seasons']:
                 for setting in season['disease']:
                     MATRIX[i][__indices.index(setting)] = season['disease'][setting]
 
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-pp.pprint(MATRIX)
+# import pprint
+# pp = pprint.PrettyPrinter(indent=4)
+# pp.pprint(MATRIX)
 
 # write matrix to external csv file
 import csv

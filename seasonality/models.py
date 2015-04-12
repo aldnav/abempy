@@ -9,6 +9,11 @@ STATES = Agent.STATES
 # Pull settings
 import settings
 
+# List id's here
+ID_DEATH_BY_INCIDENCE = settings.__indices.index('death_by_incidence')
+ID_INFECTION_PROBABILITY_PERSON = settings.__indices.index('infection_probability_person')
+ID_INFECTION_PROBABILITY_MOSQUITO = settings.__indices.index('infection_probability_mosquito')
+
 
 class Person(models.Agent):
     """The person agent"""
@@ -17,9 +22,19 @@ class Person(models.Agent):
         models.Agent.__init__(self, *args, **kwargs)
         self.infection_duration = random.randrange(
             *settings.disease["infection_duration"])
-        self.infection_probability = float(settings.disease["infection_probability_person"])
+        self.infection_probability = float(
+            settings.disease["infection_probability_person"])
+
+    def pre_run(self):
+        #: update attributes according to time
+        self.cur_time = self.environment.current_time
+        #: pull from MATRIX
+        self.infection_probability = settings.MATRIX[self.cur_time][ID_INFECTION_PROBABILITY_PERSON]
 
     def run(self):
+        #: update attributes first
+        self.pre_run()
+
         #: CASE: Currently infected so infection duration minimized
         if self.state is STATES.INFECTED:
             if self.infection_duration > 0:
@@ -36,7 +51,6 @@ class Person(models.Agent):
 class Mosquito(models.Agent):
     """The mosquito agent"""
 
-
     def __init__(self, *args, **kwargs):
         models.Agent.__init__(self, *args, **kwargs)
         #: Tells whether the mosquito is dying
@@ -44,7 +58,15 @@ class Mosquito(models.Agent):
         #: Indicates the chance of mosquito's death by incidence
         self.death_probability = float(settings.contact["death_by_incidence"])
         #: Indicates the chance of the mosquito to get infected
-        self.infection_probability = float(settings.disease["infection_probability_mosquito"])
+        self.infection_probability = float(
+            settings.disease["infection_probability_mosquito"])
+
+    def pre_run(self):
+        #: update attributes according to time
+        self.cur_time = self.environment.current_time
+        #: pull from MATRIX
+        self.death_probability = settings.MATRIX[self.cur_time][ID_DEATH_BY_INCIDENCE]
+        self.infection_probability = settings.MATRIX[self.cur_time][ID_INFECTION_PROBABILITY_MOSQUITO]
 
     def run(self):
         """
@@ -54,6 +76,9 @@ class Mosquito(models.Agent):
         [2] Bite persons
         [3] Evaluate death by probability
         """
+        #: Update attributes first
+        self.pre_run()
+
         # TODO: If mosquito is dying, remove mosquito from manager
         # TODO: CREATE ENVIRONMENT FIRST!
         if self.is_dying:
@@ -126,7 +151,8 @@ class PersonManager(models.Manager):
             settings.environment['no_of_persons'])
 
         #: reset counters for states
-        self.counter_susceptible = int(settings.environment['no_of_persons']) - (infected_count + recovered_count)
+        self.counter_susceptible = int(settings.environment['no_of_persons']) -\
+            (infected_count + recovered_count)
         self.counter_infected = infected_count
         self.counter_recovered = recovered_count
 
@@ -168,7 +194,8 @@ class MosquitoManager(models.Manager):
             settings.disease['initially_infected_mosquitoes'] *
             settings.environment['no_of_mosquitoes'])
         #: reset counters for states
-        self.counter_susceptible = int(settings.environment['no_of_persons']) - infected_count
+        self.counter_susceptible = int(settings.environment['no_of_persons']) -\
+            infected_count
         self.counter_infected = infected_count
 
         for mosquito in self.queue:
