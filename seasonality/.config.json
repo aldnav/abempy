@@ -1,0 +1,31 @@
+{
+    "system": {
+        "generate_output_file": 1,
+        "seasons": ["season-1"]
+    },
+	"environment": {
+		"time_steps": 100,
+		"no_of_persons": 1000,
+		"no_of_mosquitoes": 1000
+	},
+	"contact": {
+		"death_by_incidence": 0.1
+	},
+	"disease": {
+		"infection_duration": [7, 14],
+		"infection_probability_person": 0.2,
+		"infection_probability_mosquito": 0.5,
+		"initially_infected_persons": 0.075,
+		"initially_recovered_persons": 0,
+		"initially_infected_mosquitoes": 0.025
+	},
+	"season-1": {
+	    "times": [
+	        [30, 60]
+	    ],
+	    "disease": {
+	        "infection_probability_person": 0.95,
+	        "infection_probability_mosquito": 0.95
+	    }
+	}
+}
