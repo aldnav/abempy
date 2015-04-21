@@ -60,6 +60,8 @@ class Mosquito(models.Agent):
         #: Indicates the chance of the mosquito to get infected
         self.infection_probability = float(
             settings.disease["infection_probability_mosquito"])
+        #: Indicates the number of bites per day
+        self.number_of_bites = int(settings.contact["number_of_bites"])
 
     def pre_run(self):
         #: update attributes according to time
@@ -101,33 +103,35 @@ class Mosquito(models.Agent):
         If the mosquito isn't infected yet and the person is infected,
         chances are the mosquitoe will get INFECTED.
         """
-        #: Choose a person to bite
-        target_person = random.choice(
-            self.environment.person_manager.queue)
-        # CASE: Person is not infected yet
-        if not target_person.is_latent:
-            # CASE: Mosquito is infected, person is susceptible
-            if (target_person.state is STATES.SUSCEPTIBLE and
-                    self.state is STATES.INFECTED):
-                if random.random() < target_person.infection_probability:
-                    target_person.state = STATES.INFECTED
-                    target_person.is_latent = True
-                    # update person manager
-                    self.environment.person_manager.counter_infected += 1
-                    self.environment.person_manager.counter_susceptible -= 1
-                    return
-        # CASE: Mosquito is not infected yet
-        if not self.is_latent:
-            # CASE: Mosquito is susceptible, person is infected
-            if (target_person.state is STATES.INFECTED and
-                    self.state is STATES.SUSCEPTIBLE):
-                if random.random() < self.infection_probability:
-                    self.state = STATES.INFECTED
-                    self.is_latent = True
-                    # update mosquito manager
-                    self.environment.mosquito_manager.counter_infected += 1
-                    self.environment.mosquito_manager.counter_susceptible -= 1
-                    return
+        current_number_of_bites = random.randint(0, self.number_of_bites)
+        for number_of_bites in xrange(current_number_of_bites):
+            #: Choose a person to bite
+            target_person = random.choice(
+                self.environment.person_manager.queue)
+            # CASE: Person is not infected yet
+            if not target_person.is_latent:
+                # CASE: Mosquito is infected, person is susceptible
+                if (target_person.state is STATES.SUSCEPTIBLE and
+                        self.state is STATES.INFECTED):
+                    if random.random() < target_person.infection_probability:
+                        target_person.state = STATES.INFECTED
+                        target_person.is_latent = True
+                        # update person manager
+                        self.environment.person_manager.counter_infected += 1
+                        self.environment.person_manager.counter_susceptible -= 1
+                        continue
+            # CASE: Mosquito is not infected yet
+            if not self.is_latent:
+                # CASE: Mosquito is susceptible, person is infected
+                if (target_person.state is STATES.INFECTED and
+                        self.state is STATES.SUSCEPTIBLE):
+                    if random.random() < self.infection_probability:
+                        self.state = STATES.INFECTED
+                        self.is_latent = True
+                        # update mosquito manager
+                        self.environment.mosquito_manager.counter_infected += 1
+                        self.environment.mosquito_manager.counter_susceptible -= 1
+                        continue
 
 
 class PersonManager(models.Manager):
