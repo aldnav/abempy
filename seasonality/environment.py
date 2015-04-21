@@ -1,19 +1,31 @@
 
+import os
+import shutil
 import time
 import logging
-import glob
 from __init__ import rel_import
 rel_import()
 from abempy.core import environment
 import settings
 
+# ready the output folder
+main_directory = settings.system['output_folder']
+if not os.path.exists(main_directory):
+    os.makedirs(main_directory)
+
 # configure the output file and logger
-path = "/".join(glob.glob(__file__)[0].split('/')[:-1]) + "/results/"
-file_name = "results" + time.strftime("%Y%m%d-%H%M%S")
-output_file = "{0}{1}.csv".format(path, file_name)
+file_name = "results-" + time.strftime("%Y%m%d-%H%M%S")
+file_name = settings.system['test_name'] + file_name
+# the directory specific to this run
+output_dir = "{0}{1}/".format(main_directory, file_name)
+os.makedirs(output_dir)
+log_file = "{0}{1}.csv".format(output_dir, file_name)
+# copy the config file
+shutil.copy2(".config.json", output_dir)
 logging.basicConfig(
-    filename=output_file, level=logging.WARNING, format='%(message)s'
+    filename=log_file, level=logging.WARNING, format='%(message)s'
 )
+
 
 person_log_raw = []
 mosquito_log_raw = []
@@ -82,6 +94,7 @@ class Environment(environment.Environment):
             [int(x) for x in line_mosquito.split(",")]))
 
     def export_excel(self):
+
         import tablib
         # save into databook
         databook = tablib.Databook()
@@ -93,5 +106,6 @@ class Environment(environment.Environment):
             datasheet = tablib.Dataset(
                 *data_raw, headers=report[1], title=report[0])
             databook.add_sheet(datasheet)
-        with open(settings.OUTPUT_EXCEL_FILENAME + '.xls', "w") as f:
+        output_file = "{0}{1}.xls".format(output_dir, file_name)
+        with open(output_file, "wb") as f:
             f.write(databook.xls)

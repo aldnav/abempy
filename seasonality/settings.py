@@ -2,7 +2,6 @@
 
 __config_file__ = '.config.json'
 __matrix_file__ = 'matrix.csv'
-OUTPUT_EXCEL_FILENAME = 'results'
 
 # Export reports
 REPORTS = (
