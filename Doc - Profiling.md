@@ -1,5 +1,5 @@
 # PROFILING
-===========
+===
 ## Attempt 1: Using a different compiler
 ### by 'cProfiler'
 > This is the part of profiling the code. I tried using PyPy compiler and check to
@@ -94,3 +94,16 @@ Line #      Hits         Time  Per Hit   % Time  Line Contents
     97    100370       103433      1.0      2.8          if random.random() < self.death_probability:
     98     10000         8076      0.8      0.2              self.is_dying = True
 ```
+
+===
+
+> It seems reasonable for the `run` of human agent because it is only necessary
+> to check if the person is infected to carry on all other actions.
+> The mosquito takes a lot of Per Hit because of its removal of dying mosquitoes
+> from the queue.
+
+## Conclusion
+Perhaps, poorly designed or, I could find a better way to handle `pre_run` and `run`,
+this would serve as a limitation for ABEMpy. Currently 200,000 agents would run for
+3 minutes (at worse) on a quad-core laptop. Improvements shall be done on the way.
+Ambitiously, the target is to run millions of agents.
