@@ -1,3 +1,4 @@
-dengue/results/
 *.pyc
 *.json
+dengue/results/
+seasonality/results/
