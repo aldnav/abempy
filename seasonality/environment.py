@@ -50,6 +50,9 @@ class Environment(environment.Environment):
             self.log_headers()
         time_steps = settings.environment['time_steps']
         for time_step in xrange(1, time_steps+1):
+            print '.',
+            if time_step % 10 == 0:
+                print '\t', time_step
             #: update current time
             self.current_time = time_step-1
             if to_log_results:

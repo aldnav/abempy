@@ -25,4 +25,8 @@ def main():
     env.simulate()
 
 if __name__ == '__main__':
-    main()
+    if settings.system['profile']:
+        import cProfile
+        cProfile.run('main()')
+    else:
+        main()
