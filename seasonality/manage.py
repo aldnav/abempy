@@ -1,10 +1,21 @@
 
+import sys
+# check to see if arguments given
+argv = sys.argv
+if argv[1:]:
+    config_file = argv[1]
+print "Run with config: ", config_file
+
+# invoke a config_file first before even instantiating settings
+import os
+os.system('python settings.py ' + config_file)
+import settings
+# settings.config_file = config_file
 from models import Person, Mosquito, PersonManager, MosquitoManager
 from environment import Environment
-import settings
 
 
-def main():
+def main(argv):
     # Get the environment ready
     num_of_persons = settings.environment['no_of_persons']
     num_of_mosquitoes = settings.environment['no_of_mosquitoes']
@@ -27,6 +38,6 @@ def main():
 if __name__ == '__main__':
     if settings.system['profile']:
         import cProfile
-        cProfile.run('main()')
+        cProfile.run('main(sys.argv)')
     else:
-        main()
+        main(sys.argv)

@@ -1,7 +1,11 @@
 
 
-__config_file__ = '.config.json'
+import sys
+
+config_file = '.config.json'
 __matrix_file__ = 'matrix.csv'
+if len(sys.argv) > 1:
+    config_file = sys.argv[1]
 
 # Export reports
 REPORTS = (
@@ -12,12 +16,13 @@ REPORTS = (
 
 import json
 
-with open(__config_file__) as f:
+# print "Settings:", config_file
+with open(config_file) as f:
     # include in namespace the configuration details
     globals().update(json.loads(f.read()))
 
 __indices = (
-    "time_steps", "death_by_incidence", "infection_duration",
+    "time_steps", "death_by_incidence", "number_of_bites", "infection_duration",
     "infection_probability_person", "infection_probability_mosquito",
     "no_of_persons", "no_of_mosquitoes"
 )
@@ -26,8 +31,10 @@ __indices = (
 MATRIX = []
 for i in xrange(environment['time_steps']):
     MATRIX.append([
-        i, contact['death_by_incidence'], disease['infection_duration'],
-        disease['infection_probability_person'], disease['infection_probability_mosquito'],
+        i, contact['death_by_incidence'], contact['number_of_bites'],
+        disease['infection_duration'],
+        disease['infection_probability_person'], disease[
+            'infection_probability_mosquito'],
         environment['no_of_persons'], environment['no_of_mosquitoes']
     ])
 
@@ -38,10 +45,12 @@ for season in system['seasons']:
         for i in xrange(time[0], time[1]):
             if 'contact' in season:
                 for setting in season['contact']:
-                    MATRIX[i][__indices.index(setting)] = season['contact'][setting]
+                    MATRIX[i][__indices.index(setting)] = season[
+                        'contact'][setting]
             if 'disease' in season:
                 for setting in season['disease']:
-                    MATRIX[i][__indices.index(setting)] = season['disease'][setting]
+                    MATRIX[i][__indices.index(setting)] = season[
+                        'disease'][setting]
 
 # import pprint
 # pp = pprint.PrettyPrinter(indent=4)

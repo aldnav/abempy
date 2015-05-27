@@ -3,7 +3,9 @@
 # import sys, os
 # sys.path.append(os.path.join(os.path.dirname(__file__), '..', ''))
 
+
 def rel_import():
-	# hack to get relative imports work
-	import sys, os
-	sys.path.append(os.path.join(os.path.dirname(__file__), '..', ''))
+    # hack to get relative imports work
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..', ''))

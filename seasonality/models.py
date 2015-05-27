@@ -11,12 +11,16 @@ import settings
 
 # List id's here
 ID_DEATH_BY_INCIDENCE = settings.__indices.index('death_by_incidence')
-ID_INFECTION_PROBABILITY_PERSON = settings.__indices.index('infection_probability_person')
-ID_INFECTION_PROBABILITY_MOSQUITO = settings.__indices.index('infection_probability_mosquito')
+ID_INFECTION_PROBABILITY_PERSON = settings.__indices.index(
+    'infection_probability_person')
+ID_INFECTION_PROBABILITY_MOSQUITO = settings.__indices.index(
+    'infection_probability_mosquito')
 
 
 class Person(models.Agent):
-    """The person agent"""
+
+    """
+    The person agent"""
 
     def __init__(self, *args, **kwargs):
         models.Agent.__init__(self, *args, **kwargs)
@@ -29,7 +33,8 @@ class Person(models.Agent):
         #: update attributes according to time
         self.cur_time = self.environment.current_time
         #: pull from MATRIX
-        self.infection_probability = settings.MATRIX[self.cur_time][ID_INFECTION_PROBABILITY_PERSON]
+        self.infection_probability = settings.MATRIX[
+            self.cur_time][ID_INFECTION_PROBABILITY_PERSON]
 
     def run(self):
         #: update attributes first
@@ -49,6 +54,7 @@ class Person(models.Agent):
 
 
 class Mosquito(models.Agent):
+
     """The mosquito agent"""
 
     def __init__(self, *args, **kwargs):
@@ -67,8 +73,10 @@ class Mosquito(models.Agent):
         #: update attributes according to time
         self.cur_time = self.environment.current_time
         #: pull from MATRIX
-        self.death_probability = settings.MATRIX[self.cur_time][ID_DEATH_BY_INCIDENCE]
-        self.infection_probability = settings.MATRIX[self.cur_time][ID_INFECTION_PROBABILITY_MOSQUITO]
+        self.death_probability = settings.MATRIX[
+            self.cur_time][ID_DEATH_BY_INCIDENCE]
+        self.infection_probability = settings.MATRIX[
+            self.cur_time][ID_INFECTION_PROBABILITY_MOSQUITO]
 
     def run(self):
         """
@@ -141,6 +149,7 @@ class PersonManager(models.Manager):
     counter_recovered = 0
 
     """Manages the person agents"""
+
     def __init__(self, queue, *args, **kwargs):
         models.Manager.__init__(self, queue, *args, **kwargs)
         self.__init_states()
@@ -188,6 +197,7 @@ class MosquitoManager(models.Manager):
     counter_infected = 0
 
     """Manages the mosquito agents"""
+
     def __init__(self, queue, *args, **kwargs):
         models.Manager.__init__(self, queue, *args, **kwargs)
         self.__init_states()

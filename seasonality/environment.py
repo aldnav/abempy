@@ -12,16 +12,19 @@ import settings
 main_directory = settings.system['output_folder']
 if not os.path.exists(main_directory):
     os.makedirs(main_directory)
+# print 'Env: ', settings.config_file, '\n', settings.system
+# import sys
+# sys.exit(0)
 
 # configure the output file and logger
 file_name = "results-" + time.strftime("%Y%m%d-%H%M%S")
 file_name = settings.system['test_name'] + file_name
 # the directory specific to this run
-output_dir = "{0}{1}/".format(main_directory, file_name)
+output_dir = "{0}/{1}/".format(main_directory, file_name)
 os.makedirs(output_dir)
 log_file = "{0}{1}.csv".format(output_dir, file_name)
 # copy the config file
-shutil.copy2(".config.json", output_dir)
+shutil.copy2(settings.config_file, output_dir)
 logging.basicConfig(
     filename=log_file, level=logging.WARNING, format='%(message)s'
 )
@@ -32,6 +35,7 @@ mosquito_log_raw = []
 
 
 class Environment(environment.Environment):
+
     """Envronment class"""
 
     def __init__(self, *args, **kwargs):
@@ -49,15 +53,15 @@ class Environment(environment.Environment):
         if to_log_results:
             self.log_headers()
         time_steps = settings.environment['time_steps']
-        for time_step in xrange(1, time_steps+1):
+        for time_step in xrange(1, time_steps + 1):
             print '.',
             if time_step % 10 == 0:
                 print '\t', time_step
             #: update current time
-            self.current_time = time_step-1
+            self.current_time = time_step - 1
             if to_log_results:
                 #: optional logging of results
-                self.log_results(time_step-1)
+                self.log_results(time_step - 1)
             #: run managers
             self.mosquito_manager.run()
             self.person_manager.run()
